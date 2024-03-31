@@ -935,6 +935,36 @@ class IncludeTest extends TestCase
                 'error_message' => 'MissingFile',
                 'directories' => [(string) getcwd() . DIRECTORY_SEPARATOR],
             ],
+            'undefinedClassInCombinationWithDuplicateClass' => [
+                'files' => [
+                    getcwd() . DIRECTORY_SEPARATOR . 'file2.php' => '<?php
+                        require("file1.php");
+
+                        class B extends A {
+                            public function foo(): void {
+                                new Foo();
+                            }
+                        }',
+                    getcwd() . DIRECTORY_SEPARATOR . 'file1.php' => '<?php
+                        /** @psalm-suppress RedundantCondition */
+                        if (true) {
+                            class A {
+                                public function fooFoo(): void {
+                                }
+                            }
+                        } else {
+                            class A {
+                                public function fooFoo(): void {
+                                }
+                            }
+                        }
+                        ',
+                ],
+                'files_to_check' => [
+                    getcwd() . DIRECTORY_SEPARATOR . 'file2.php',
+                ],
+                'error_message' => 'UndefinedClass',
+            ],
         ];
     }
 }
